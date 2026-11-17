@@ -1,9 +1,9 @@
 import json,os,urllib.request as u
 I='PNBRQK';Z=' '*8
-E=os.environ['MAKEFUN_ENV_URL'];V=[100,320,330,500,900,0];KN=[33,31,18,14,-14,-18,-31,-33];RD=[1,-1,16,-16];BD=[15,17,-15,-17];KG=RD+BD;CM={0:13,7:14,4:12,112:7,119:11,116:3};DO={'N':KN,'K':KG,'B':BD,'R':RD,'Q':KG};X=lambda b:[b|z<<14 for z in range(2,6)]
-MT=10**5;NB=30000
+V=[100,320,330,500,900,0];KN=[33,31,18,14,-14,-18,-31,-33];RD=[1,-1,16,-16];BD=[15,17,-15,-17];KG=RD+BD;CM={0:13,7:14,4:12,112:7,119:11,116:3};DO=[0,KN,BD,RD,KG,KG];X=lambda b:[b|z<<14 for z in(2,3,4,5)]
+MT=1e5;NB=3e4
 PS="AAAACCCCGGGGMMMUUUUaaaaiqqquAAAA/49>49>C9>CH>CHM>CHM9>CH49>C/49>7;?C;?CG?CGKCGKOCGKO?CGK;?CG7;?C"
-H=[' ']*128;SD=CA=0;EP=-1;KI=[0,0];U=[];ND=LM=AB=0
+H=[' ']*128;SD=CA=0;EP=-1;KI=[0,0];U=[];ND=LM=AB=0;D={}
 n=lambda s:chr(s%8+97)+str(s//16+1)
 j=lambda m:n(m&127)+n(m>>7&127)+('xxnbrq'[m>>14]if m>>14 else'')
 q=lambda x:ord(x[1])*16+ord(x[0])-881
@@ -11,10 +11,10 @@ def ev():
  s=0
  for i,p in enumerate(H):
   if p==' ':continue
-  x=I.index(p.upper());r=i>>4;a=abs(r-7*(p>'a'));v=V[x]+(ord(PS[min(x,2)*32+min(i&7,7-i&7)+4*a])-65 if x<5 else-25*a);s+=v if p<'a' else-v
+  x=I.find(p.upper());r=i>>4;a=abs(r-7*(p>'a'));v=V[x]+(ord(PS[min(x,2)*32+min(i&7,7-i&7)+4*a])-65 if x<5 else-25*a);s+=v if p<'a' else-v
  return s*(1-2*SD)
 def A(q,y):
- u=I if y==0 else I.lower();d=1-2*y
+ u=I.lower()if y else I;d=1-2*y
  for o in(-15*d,-17*d):
   t=q+o
   if not t&0x88 and H[t]==u[0]:return 1
@@ -47,11 +47,11 @@ def G(c=0):
       if r==l:m+=X(f|y<<7)
       elif not c:
        m.append(f|y<<7)
-       if r==6-5*w and H[y+d]==' ':m.append(f|y+d<<7)
+       if r==7-l and H[y+d]==' ':m.append(f|y+d<<7)
     elif g!=' 'and(g<'a')^w:m+=X(f|y<<7)if r==l else[f|y<<7]
     elif y==EP:m.append(f|y<<7)
    continue
-  for o in DO[t]:
+  for o in DO[I.find(t)]:
    y=f
    while 1:
     y+=o
@@ -83,18 +83,17 @@ def M(m):
 def W():
  global SD,CA,EP,KI;b,SD,CA,EP,KI=U.pop();H[:]=b
 def O(ms):
- k=[]
- for m in ms:
-  t=m>>7&127;tg=H[t];s=(1000+V[I.index(tg.upper())]-V[I.index(H[m&127].upper())]if tg!=' 'else 0)+(V[(m>>14)-1]if m>>14 else 0);k.append((s<<17)|m)
- k.sort(reverse=1);ms[:]=[x&131071 for x in k]
+ ms.sort(key=lambda m:((m==Y),((1000+V[I.find(H[m>>7&127].upper())]-V[I.find(H[m&127].upper())]if H[m>>7&127]!=' 'else 0)+(V[(m>>14)-1]if m>>14 else 0))<<17|m),reverse=1)
 def S(d,a,b,pl):
- global ND,AB;ND+=1
+ global ND,AB,Y;ND+=1
  if ND>=LM:AB=1;return 0
  ck=A(KI[SD],SD^1);bt=-MT-1;q=d<=0 and not ck
  if q:
   bt=ev()
   if bt>=b:return bt
   if bt>a:a=bt
+ Y=0
+ if d>0:K=(''.join(H),SD,CA,EP);Y=D.get(K)
  ms=G(q);O(ms);ln=bm=0
  for m in ms:
   if not M(m):continue
@@ -104,10 +103,11 @@ def S(d,a,b,pl):
   if s>=b:break
   if s>a:a=s
  if ln==0:return-MT+pl if ck else bt*(d<=0)
+ if d>0:D[K]=bm
  return bt
 def T():
- global ND,LM,AB;mv=[m for m in G()if M(m)and(W()or 1)]
- O(mv);bm=mv[0];d=ND=AB=0;LM=NB
+ global ND,LM,AB,Y;mv=[m for m in G()if M(m)and not W()]
+ Y=0;O(mv);bm=mv[0];d=ND=AB=0;LM=NB
  while d<12 and not AB:
   d+=1;ND=AB=0;LM=NB;a=bs=-MT-1;bd=bm
   for m in mv:
@@ -119,7 +119,7 @@ def T():
   bm=bd
  return bm
 def P(p,b):
- try:return json.load(u.urlopen(E+p,json.dumps(b).encode()))
+ try:return json.load(u.urlopen(os.environ['MAKEFUN_ENV_URL']+p,json.dumps(b).encode()))
  except:return{'error':1}
 def main():
  global H,SD,CA,EP,KI
@@ -128,7 +128,7 @@ def main():
   if 'error'in g or g['status']=='done':break
   while g.get('status')=='your_move':
    try:
-    H=list('RNBQKBNR'+Z+'PPPPPPPP'+' '*72+'pppppppp'+Z+'rnbqkbnr'+Z);SD=0;CA=15;EP=-1;KI=[4,116]
+    H=list('RNBQKBNR'+Z+'PPPPPPPP'+Z*9+'pppppppp'+Z+'rnbqkbnr'+Z);SD=0;CA=15;EP=-1;KI=[4,116]
     for z in g['moves']:
      if not M(q(z[:2])|q(z[2:4])<<7|('nbrq'.find(z[4:])+2)*(len(z)==5)<<14):break
     mv=j(T())
